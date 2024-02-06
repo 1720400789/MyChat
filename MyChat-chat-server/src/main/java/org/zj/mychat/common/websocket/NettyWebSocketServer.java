@@ -68,7 +68,12 @@ public class NettyWebSocketServer {
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         ChannelPipeline pipeline = socketChannel.pipeline();
                         //30秒客户端没有向服务器发送心跳则关闭连接
-//                        pipeline.addLast(new IdleStateHandler(30, 0, 0));
+                        /**
+                         * readerIdleTimeSeconds: 读空闲事件，如果 30 秒内客户端没有向服务器发送消息则断开连接
+                         * writerIdelTimeSeconds: 写空闲事件，如果 ** 秒内服务器端没有向客户端推送消息则断开连接
+                         * 如果处理到这些事件，则会触发对应的事件，之后 @see NettyWebSocketServerHandler 中捕捉并处理
+                         */
+                        pipeline.addLast(new IdleStateHandler(30, 0, 0));
                         // 因为使用http协议，所以需要使用http的编码器，解码器
                         pipeline.addLast(new HttpServerCodec());
                         // 以块方式写，添加 chunkedWriter 处理器
