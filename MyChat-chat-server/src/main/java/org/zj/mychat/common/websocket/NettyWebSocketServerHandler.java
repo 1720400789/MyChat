@@ -30,6 +30,9 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             if (event.state() == IdleState.READER_IDLE) {
                 // TODO 则说明客户端心跳停止，做出相关【用户下线】的工作
                 log.debug("读空闲发生");
+
+                // 关闭连接
+                ctx.channel().close();
             }
         }
     }

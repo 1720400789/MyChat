@@ -69,8 +69,8 @@ public class NettyWebSocketServer {
                         ChannelPipeline pipeline = socketChannel.pipeline();
                         //30秒客户端没有向服务器发送心跳则关闭连接
                         /**
-                         * readerIdleTimeSeconds: 读空闲事件，如果 30 秒内客户端没有向服务器发送消息则断开连接
-                         * writerIdelTimeSeconds: 写空闲事件，如果 ** 秒内服务器端没有向客户端推送消息则断开连接
+                         * readerIdleTimeSeconds: 读空闲事件，如果 30 秒内客户端没有向服务器发送消息则抛出读空闲事件
+                         * writerIdelTimeSeconds: 写空闲事件，如果 ** 秒内服务器端没有向客户端推送消息则抛出写空闲事件
                          * 如果处理到这些事件，则会触发对应的事件，之后 @see NettyWebSocketServerHandler 中捕捉并处理
                          */
                         pipeline.addLast(new IdleStateHandler(30, 0, 0));
