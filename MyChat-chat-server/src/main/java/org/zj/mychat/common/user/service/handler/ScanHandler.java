@@ -5,8 +5,9 @@ import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.zj.mychat.common.user.service.adapter.TextBuilder;
+import org.zj.mychat.common.user.service.WXMsgService;
 
 import java.util.Map;
 
@@ -16,17 +17,13 @@ import java.util.Map;
 @Component
 public class ScanHandler extends AbstractHandler {
 
-
-//    @Autowired
-//    private WxMsgService wxMsgService;
+    @Autowired
+    private WXMsgService wxMsgService;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMpXmlMessage, Map<String, Object> map,
                                     WxMpService wxMpService, WxSessionManager wxSessionManager) throws WxErrorException {
-        // 扫码事件处理
-        String code = wxMpXmlMessage.getEventKey();
-        String fromUser = wxMpXmlMessage.getFromUser();
-        return TextBuilder.build("你好", wxMpXmlMessage);
+        return wxMsgService.scan(wxMpXmlMessage);
     }
 
 }

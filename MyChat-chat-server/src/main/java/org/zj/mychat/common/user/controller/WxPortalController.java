@@ -2,6 +2,8 @@ package org.zj.mychat.common.user.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
+import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -11,6 +13,7 @@ import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
+import org.zj.mychat.common.user.service.WXMsgService;
 
 /**
  * 微信api交互接口
@@ -24,6 +27,7 @@ public class WxPortalController {
     private final WxMpService wxService;
     private final WxMpMessageRouter messageRouter;
     private final WxMpService wxMpService;
+    private final WXMsgService wxMsgService;
 
     @GetMapping("/test")
     public String getQrcode() throws WxErrorException {
@@ -53,9 +57,19 @@ public class WxPortalController {
         return "非法请求";
     }
 
+    /**
+     * 用户扫描微信二维码后的回调函数
+     * @param code 扫描二维码后微信给出的用户唯一 token，通过这个 token 可以解析出用户信息
+     * @return void
+     */
     @GetMapping("/callBack")
-    public RedirectView callBack(@RequestParam String code) {
-        return null;
+    public RedirectView callBack(@RequestParam String code) throws WxErrorException {
+        WxOAuth2AccessToken accessToken = wxMpService.getOAuth2Service().getAccessToken(code);
+        WxOAuth2UserInfo userInfo = wxMpService.getOAuth2Service().getUserInfo(accessToken, "zh_CN");
+        wxMsgService.authorize(userInfo);
+        RedirectView redirectView = new RedirectView();
+        redirectView.setUrl("www.mallchat.cn");
+        return redirectView;
     }
 
     @PostMapping(produces = "application/xml; charset=UTF-8")
