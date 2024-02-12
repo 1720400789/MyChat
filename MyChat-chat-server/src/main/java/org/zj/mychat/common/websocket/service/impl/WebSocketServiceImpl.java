@@ -17,12 +17,9 @@ import org.zj.mychat.common.user.dao.UserDao;
 import org.zj.mychat.common.user.domain.entity.User;
 import org.zj.mychat.common.user.service.LoginService;
 import org.zj.mychat.common.websocket.domain.dto.WSChannelExtraDTO;
-import org.zj.mychat.common.websocket.domain.enums.WSRespTypeEnum;
 import org.zj.mychat.common.websocket.domain.vo.resp.WSBaseResp;
-import org.zj.mychat.common.websocket.domain.vo.resp.WSLoginUrl;
 import org.zj.mychat.common.websocket.service.WebSocketService;
 import org.zj.mychat.common.websocket.service.adapter.WebSocketAdapter;
-
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;

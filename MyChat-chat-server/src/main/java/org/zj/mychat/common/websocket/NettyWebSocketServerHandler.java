@@ -13,7 +13,6 @@ import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.zj.mychat.common.websocket.domain.enums.WSReqTypeEnum;
 import org.zj.mychat.common.websocket.domain.vo.req.WSBaseReq;
-import org.zj.mychat.common.websocket.domain.vo.resp.WSBaseResp;
 import org.zj.mychat.common.websocket.service.WebSocketService;
 
 
