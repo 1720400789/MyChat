@@ -1,5 +1,6 @@
 package org.zj.mychat.common.websocket;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import io.netty.channel.Channel;
@@ -49,6 +50,10 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
             log.debug("握手完成");
+            String token = NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN);
+            if (StrUtil.isNotBlank(token)) {
+                webSocketService.authorize(ctx.channel(), token);
+            }
         } else if (evt instanceof IdleStateEvent) {
             /* 下面是心跳捕捉后的处理逻辑 */
             // 将 evt 强转为【空闲事件对象】
@@ -57,7 +62,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
             if (event.state() == IdleState.READER_IDLE) {
                 // TODO 则说明客户端心跳停止，做出相关【用户下线】的工作
                 log.debug("读空闲发生");
-
+                userOffline(ctx.channel());
                 // 关闭连接
                 ctx.channel().close();
             }
@@ -81,7 +86,7 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
         WSBaseReq wsBaseReq = JSONUtil.toBean(text, WSBaseReq.class);
         switch (WSReqTypeEnum.of(wsBaseReq.getType())) {
             case AUTHORIZE:
-                break;
+                webSocketService.authorize(ctx.channel(), wsBaseReq.getData());
             case HEARTBEAT:
                 break;
             case LOGIN:

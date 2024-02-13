@@ -53,4 +53,14 @@ public class WebSocketAdapter {
         resp.setType(WSRespTypeEnum.LOGIN_SCAN_SUCCESS.getType());
         return resp;
     }
+
+    /**
+     * 包装提示用户 token 过期的信息
+     * @return 提示信息
+     */
+    public static WSBaseResp<?> buildInvalidTokenResp() {
+        WSBaseResp<WSLoginUrl> resp = new WSBaseResp<>();
+        resp.setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
+        return resp;
+    }
 }
