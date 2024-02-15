@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.zj.mychat.common.common.domain.dto.RequestInfo;
 import org.zj.mychat.common.common.domain.vo.resp.ApiResult;
+import org.zj.mychat.common.common.utils.RequestHolder;
 import org.zj.mychat.common.user.domain.vo.resp.UserInfoResp;
 
 /**
@@ -28,7 +30,7 @@ public class UserController {
     @GetMapping("/userinfo")
     @ApiOperation("获取用户个人信息")
     public ApiResult<UserInfoResp> getUserInfo() {
-
+        RequestInfo requestInfo = RequestHolder.get();
         return null;
     }
 }
