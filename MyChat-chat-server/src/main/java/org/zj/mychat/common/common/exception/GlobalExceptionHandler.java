@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = BussinessException.class)
     public ApiResult<?> bussinessException(BussinessException e) {
-        log.info("system exception! The reason is: {}", e.getMessage());
+        log.info("system exception! The reason is: {}", e.getMessage(), e);
         return ApiResult.fail(e.getErrorCode(), e.getErrorMsg());
     }
 }
