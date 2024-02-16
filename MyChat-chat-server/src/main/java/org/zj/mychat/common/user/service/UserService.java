@@ -1,6 +1,8 @@
 package org.zj.mychat.common.user.service;
 
 import org.zj.mychat.common.user.domain.entity.User;
+import org.zj.mychat.common.user.domain.vo.req.ModifyNameReq;
+import org.zj.mychat.common.user.domain.vo.resp.UserInfoResp;
 
 /**
  * <p>
@@ -12,4 +14,8 @@ import org.zj.mychat.common.user.domain.entity.User;
 public interface UserService {
 
     Long register(User insert);
+
+    UserInfoResp getUserInfo(Long uid);
+
+    void modifyName(Long uid, String name);
 }

@@ -3,16 +3,18 @@ package org.zj.mychat.common.user.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.zj.mychat.common.common.domain.dto.RequestInfo;
 import org.zj.mychat.common.common.domain.vo.resp.ApiResult;
 import org.zj.mychat.common.common.utils.RequestHolder;
+import org.zj.mychat.common.user.domain.vo.req.ModifyNameReq;
 import org.zj.mychat.common.user.domain.vo.resp.UserInfoResp;
+import org.zj.mychat.common.user.service.UserService;
+
+import javax.validation.Valid;
 
 /**
  * <p>
@@ -27,11 +29,20 @@ import org.zj.mychat.common.user.domain.vo.resp.UserInfoResp;
 @Api(tags = "用户相关接口")
 public class UserController {
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping("/userinfo")
     @ApiOperation("获取用户个人信息")
     public ApiResult<UserInfoResp> getUserInfo() {
-        RequestInfo requestInfo = RequestHolder.get();
-        return null;
+        return ApiResult.success(userService.getUserInfo(RequestHolder.get().getUid()));
+    }
+
+    @PutMapping("/name")
+    @ApiOperation("修改用户名")
+    public ApiResult<Void> modifyName(@Valid @RequestBody ModifyNameReq req) {
+        userService.modifyName(RequestHolder.get().getUid(), req.getName());
+        return ApiResult.success();
     }
 }
 
