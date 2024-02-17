@@ -2,7 +2,7 @@ package org.zj.mychat.common.common.utils;
 
 import cn.hutool.core.util.ObjectUtil;
 import org.hibernate.validator.HibernateValidator;
-import org.zj.mychat.common.common.exception.BussinessException;
+import org.zj.mychat.common.common.exception.BusinessException;
 import org.zj.mychat.common.common.exception.CommonErrorEnum;
 import org.zj.mychat.common.common.exception.ErrorEnum;
 
@@ -152,9 +152,9 @@ public class AssertUtil {
 
     private static void throwException(ErrorEnum errorEnum, Object... arg) {
         if (Objects.isNull(errorEnum)) {
-            errorEnum = CommonErrorEnum.BUSSINESS_ERROR;
+            errorEnum = CommonErrorEnum.BUSINESS_ERROR;
         }
-        throw new BussinessException(errorEnum.getErrorCode(), MessageFormat.format(errorEnum.getErrorMsg(), arg));
+        throw new BusinessException(errorEnum.getErrorCode(), MessageFormat.format(errorEnum.getErrorMsg(), arg));
     }
 
 

@@ -28,8 +28,8 @@ public class GlobalExceptionHandler {
         return ApiResult.fail(CommonErrorEnum.SYSTEM_ERROR);
     }
 
-    @ExceptionHandler(value = BussinessException.class)
-    public ApiResult<?> bussinessException(BussinessException e) {
+    @ExceptionHandler(value = BusinessException.class)
+    public ApiResult<?> businessException(BusinessException e) {
         log.info("system exception! The reason is: {}", e.getMessage(), e);
         return ApiResult.fail(e.getErrorCode(), e.getErrorMsg());
     }

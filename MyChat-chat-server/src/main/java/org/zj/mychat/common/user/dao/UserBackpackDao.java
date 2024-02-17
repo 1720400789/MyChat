@@ -61,4 +61,15 @@ public class UserBackpackDao extends ServiceImpl<UserBackpackMapper, UserBackpac
                 .in(UserBackpack::getItemId, itemId)
                 .list();
     }
+
+    /**
+     * 通过幂等号查询用户背包中物品
+     * @param idempotent 幂等号
+     * @return 物品
+     */
+    public UserBackpack getByIdemopotent(String idempotent) {
+        return lambdaQuery()
+                .eq(UserBackpack::getIdempotent, idempotent)
+                .one();
+    }
 }
