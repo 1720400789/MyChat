@@ -5,16 +5,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.stereotype.Controller;
-import org.zj.mychat.common.common.domain.dto.RequestInfo;
 import org.zj.mychat.common.common.domain.vo.resp.ApiResult;
 import org.zj.mychat.common.common.utils.RequestHolder;
 import org.zj.mychat.common.user.domain.vo.req.ModifyNameReq;
+import org.zj.mychat.common.user.domain.vo.req.WearingBagdeReq;
+import org.zj.mychat.common.user.domain.vo.resp.BadgeResp;
 import org.zj.mychat.common.user.domain.vo.resp.UserInfoResp;
 import org.zj.mychat.common.user.service.UserService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -42,6 +42,25 @@ public class UserController {
     @ApiOperation("修改用户名")
     public ApiResult<Void> modifyName(@Valid @RequestBody ModifyNameReq req) {
         userService.modifyName(RequestHolder.get().getUid(), req.getName());
+        return ApiResult.success();
+    }
+
+    /**
+     * 获取徽章列表
+     */
+    @GetMapping("/badges")
+    @ApiOperation("可选徽章预览")
+    public ApiResult<List<BadgeResp>> badges() {
+        return ApiResult.success(userService.badges(RequestHolder.get().getUid()));
+    }
+
+    /**
+     * 佩戴徽章
+     */
+    @PutMapping("/badges")
+    @ApiOperation("佩戴徽章")
+    public ApiResult<Void> wearingBadges(@Valid @RequestBody WearingBagdeReq req) {
+        userService.wearingBadges(RequestHolder.get().getUid(), req.getItemId());
         return ApiResult.success();
     }
 }

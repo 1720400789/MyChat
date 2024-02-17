@@ -16,22 +16,49 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserDao extends ServiceImpl<UserMapper, User> {
 
+    /**
+     * 获取用户信息
+     * @param openId 用户标识
+     * @return 用户信息
+     */
     public User getByOpenId(String openId) {
         return lambdaQuery()
                 .eq(User::getOpenId, openId)
                 .one();
     }
 
+    /**
+     * 获取用户信息
+     * @param name 用户名
+     * @return 用户信息
+     */
     public User getByName(String name) {
         return lambdaQuery()
                 .eq(User::getName, name)
                 .one();
     }
 
+    /**
+     * 更改用户名
+     * @param uid 用户 id
+     * @param name 需要更改的用户名
+     */
     public void modifyName(Long uid, String name) {
         lambdaUpdate()
                 .eq(User::getId, uid)
                 .set(User::getName, name)
+                .update();
+    }
+
+    /**
+     * 佩戴徽章
+     * @param uid 用户 id
+     * @param itemId 物品 id
+     */
+    public void wearingBadge(Long uid, Long itemId) {
+        lambdaUpdate()
+                .eq(User::getId, uid)
+                .set(User::getItemId, itemId)
                 .update();
     }
 }

@@ -2,7 +2,10 @@ package org.zj.mychat.common.user.service;
 
 import org.zj.mychat.common.user.domain.entity.User;
 import org.zj.mychat.common.user.domain.vo.req.ModifyNameReq;
+import org.zj.mychat.common.user.domain.vo.resp.BadgeResp;
 import org.zj.mychat.common.user.domain.vo.resp.UserInfoResp;
+
+import java.util.List;
 
 /**
  * <p>
@@ -18,4 +21,8 @@ public interface UserService {
     UserInfoResp getUserInfo(Long uid);
 
     void modifyName(Long uid, String name);
+
+    List<BadgeResp> badges(Long uid);
+
+    void wearingBadges(Long uid, Long itemId);
 }
