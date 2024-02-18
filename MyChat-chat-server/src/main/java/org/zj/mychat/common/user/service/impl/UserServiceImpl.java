@@ -3,8 +3,11 @@ package org.zj.mychat.common.user.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zj.mychat.common.common.annotation.RedissonLock;
+import org.zj.mychat.common.common.event.UserRegisterEvent;
 import org.zj.mychat.common.common.utils.AssertUtil;
 import org.zj.mychat.common.user.dao.ItemConfigDao;
 import org.zj.mychat.common.user.dao.UserBackpackDao;
@@ -40,6 +43,12 @@ public class UserServiceImpl implements UserService {
     private ItemConfigDao itemConfigDao;
 
     /**
+     * Spring 提供的事件发送者
+     */
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    /**
      * 用户注册接口
      * @param insert 待注册的用户
      * @return 标识
@@ -48,7 +57,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Long register(User insert) {
         userDao.save(insert);
-        // TODO 用户注册的事件
+        // 用户注册的事件
+        applicationEventPublisher.publishEvent(new UserRegisterEvent(this, insert));
         return insert.getId();
     }
 
@@ -71,6 +81,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @RedissonLock(key = "#uid")
     public void modifyName(Long uid, String name) {
         User oldUser = userDao.getByName(name);
         AssertUtil.isEmpty(oldUser, "名字已经被抢占了，请换一个");
