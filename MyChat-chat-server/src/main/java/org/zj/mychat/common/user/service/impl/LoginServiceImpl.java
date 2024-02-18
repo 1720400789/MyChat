@@ -44,14 +44,17 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public Long getValidUid(String token) {
+        // 解析出请求携带的 token
         Long uid = jwtUtils.getUidOrNull(token);
         if (Objects.isNull(uid)) {
             return null;
         }
+        // 从中心化件中取出旧 token
         String oldToken = RedisUtils.getStr(getUserTokenKey(uid));
         if (StringUtils.isBlank(oldToken)) {
             return null;
         }
+        // 如果匹配则返回 uid
         return Objects.equals(oldToken, token) ? uid : null;
     }
 
