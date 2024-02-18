@@ -131,11 +131,15 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Override
     public void authorize(Channel channel, String token) {
         Long validUid = loginService.getValidUid(token);
-        if (Objects.isNull(channel)) {
+        if (Objects.nonNull(validUid)) {
+            // 如果 token 存在，则说明用户登录可用
             User user = userDao.getById(validUid);
+            // 登录成功处理的逻辑
             loginSuccess(channel, user, token);
+            // 提示用户登录成功
             sendMsg(channel, WebSocketAdapter.buildResp(user, token));
         } else {
+            // 如果 token 不存在，则提示前端用户登录已过期
             sendMsg(channel, WebSocketAdapter.buildInvalidTokenResp());
         }
     }
