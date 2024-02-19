@@ -6,21 +6,27 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.zj.mychat.common.common.event.UserOnlineEvent;
 import org.zj.mychat.common.user.dao.UserDao;
+import org.zj.mychat.common.user.domain.entity.IpInfo;
 import org.zj.mychat.common.user.domain.entity.User;
 import org.zj.mychat.common.user.service.LoginService;
+import org.zj.mychat.common.websocket.NettyUtil;
 import org.zj.mychat.common.websocket.domain.dto.WSChannelExtraDTO;
 import org.zj.mychat.common.websocket.domain.vo.resp.WSBaseResp;
 import org.zj.mychat.common.websocket.service.WebSocketService;
 import org.zj.mychat.common.websocket.service.adapter.WebSocketAdapter;
 import java.time.Duration;
+import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -40,6 +46,9 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     public static final Duration DURATION = Duration.ofMinutes(5);
     public static final int MAXIMUM_SIZE = 1000;
@@ -148,9 +157,12 @@ public class WebSocketServiceImpl implements WebSocketService {
         // 保存 channel 的对应 uid
         WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
         wsChannelExtraDTO.setUid(user.getId());
-        // TODO 用户上线成功的事件
         // 推送成功的消息
         sendMsg(channel, WebSocketAdapter.buildResp(user, token));
+        // 用户上线成功的事件
+        user.setLastOptTime(new Date());
+        user.refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
+        applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
     }
 
     private void sendMsg(Channel channel, WSBaseResp<?> resp) {
