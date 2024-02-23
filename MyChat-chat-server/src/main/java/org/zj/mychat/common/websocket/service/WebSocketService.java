@@ -1,6 +1,7 @@
 package org.zj.mychat.common.websocket.service;
 
 import io.netty.channel.Channel;
+import org.zj.mychat.common.websocket.domain.vo.resp.WSBaseResp;
 
 public interface WebSocketService {
     /**
@@ -35,4 +36,10 @@ public interface WebSocketService {
     void waitAuthorize(Integer code);
 
     void authorize(Channel channel, String token);
+
+    /**
+     * 向所有在线用户推送消息
+     * @param msg 待推送的消息
+     */
+    void sendMsgToAll(WSBaseResp<?> msg);
 }

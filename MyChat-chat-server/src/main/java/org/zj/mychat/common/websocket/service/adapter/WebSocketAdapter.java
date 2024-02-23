@@ -1,6 +1,7 @@
 package org.zj.mychat.common.websocket.service.adapter;
 
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
+import org.zj.mychat.common.common.domain.enums.YesOrNoEnum;
 import org.zj.mychat.common.user.domain.entity.User;
 import org.zj.mychat.common.websocket.domain.enums.WSRespTypeEnum;
 import org.zj.mychat.common.websocket.domain.vo.resp.WSBaseResp;
@@ -29,9 +30,10 @@ public class WebSocketAdapter {
      * 包装用户信息，即当用户登录成功后返回的信息
      * @param user 用户信息
      * @param token 用户 token
+     * @param power
      * @return 信息
      */
-    public static WSBaseResp<?> buildResp(User user, String token) {
+    public static WSBaseResp<?> buildResp(User user, String token, boolean power) {
         WSBaseResp<WSLoginSuccess> resp = new WSBaseResp<>();
         resp.setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());
         WSLoginSuccess loginSuccess = WSLoginSuccess.builder()
@@ -39,6 +41,7 @@ public class WebSocketAdapter {
                 .name(user.getName())
                 .token(token)
                 .uid(user.getId())
+                .power(power ? YesOrNoEnum.YES.getStatus() : YesOrNoEnum.NO.getStatus())
                 .build();
         resp.setData(loginSuccess);
         return resp;
@@ -61,6 +64,16 @@ public class WebSocketAdapter {
     public static WSBaseResp<?> buildInvalidTokenResp() {
         WSBaseResp<WSLoginUrl> resp = new WSBaseResp<>();
         resp.setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
+        return resp;
+    }
+
+    public static WSBaseResp<?> buildBlack(User user) {
+        WSBaseResp<WSLoginSuccess> resp = new WSBaseResp<>();
+        resp.setType(WSRespTypeEnum.BLACK.getType());
+        WSLoginSuccess loginSuccess = WSLoginSuccess.builder()
+                .uid(user.getId())
+                .build();
+        resp.setData(loginSuccess);
         return resp;
     }
 }

@@ -14,12 +14,16 @@ import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.zj.mychat.common.common.event.UserOnlineEvent;
 import org.zj.mychat.common.user.dao.UserDao;
 import org.zj.mychat.common.user.domain.entity.IpInfo;
 import org.zj.mychat.common.user.domain.entity.User;
+import org.zj.mychat.common.user.domain.enums.RoleEnum;
 import org.zj.mychat.common.user.service.LoginService;
+import org.zj.mychat.common.user.service.RoleService;
+import org.zj.mychat.common.user.service.UserRoleService;
 import org.zj.mychat.common.websocket.NettyUtil;
 import org.zj.mychat.common.websocket.domain.dto.WSChannelExtraDTO;
 import org.zj.mychat.common.websocket.domain.vo.resp.WSBaseResp;
@@ -46,6 +50,15 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private RoleService roleService;
+
+    /**
+     * 引入我们自定义的线程池
+     */
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -146,11 +159,25 @@ public class WebSocketServiceImpl implements WebSocketService {
             // 登录成功处理的逻辑
             loginSuccess(channel, user, token);
             // 提示用户登录成功
-            sendMsg(channel, WebSocketAdapter.buildResp(user, token));
+//            sendMsg(channel, WebSocketAdapter.buildResp(user, token));
         } else {
             // 如果 token 不存在，则提示前端用户登录已过期
             sendMsg(channel, WebSocketAdapter.buildInvalidTokenResp());
         }
+    }
+
+    /**
+     * 向所有在线的用户推送消息
+     * @param msg 待推送的消息
+     */
+    @Override
+    public void sendMsgToAll(WSBaseResp<?> msg) {
+        // ONLEINS_WS_MAP 中存储着所有当前在线的用户的 channel 连接
+        ONLINE_WS_MAP.forEach(((channel, wsChannelExtraDTO) -> {
+            threadPoolTaskExecutor.execute(() -> {
+                sendMsg(channel, msg);
+            });
+        }));
     }
 
     private void loginSuccess(Channel channel, User user, String token) {
@@ -158,7 +185,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
         wsChannelExtraDTO.setUid(user.getId());
         // 推送成功的消息
-        sendMsg(channel, WebSocketAdapter.buildResp(user, token));
+        sendMsg(channel, WebSocketAdapter.buildResp(user, token, roleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER)));
         // 用户上线成功的事件
         user.setLastOptTime(new Date());
         user.refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));

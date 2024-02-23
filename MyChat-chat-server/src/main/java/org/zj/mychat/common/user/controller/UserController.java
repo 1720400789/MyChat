@@ -6,11 +6,15 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.zj.mychat.common.common.domain.vo.resp.ApiResult;
+import org.zj.mychat.common.common.utils.AssertUtil;
 import org.zj.mychat.common.common.utils.RequestHolder;
+import org.zj.mychat.common.user.domain.enums.RoleEnum;
+import org.zj.mychat.common.user.domain.vo.req.BlackReq;
 import org.zj.mychat.common.user.domain.vo.req.ModifyNameReq;
 import org.zj.mychat.common.user.domain.vo.req.WearingBagdeReq;
 import org.zj.mychat.common.user.domain.vo.resp.BadgeResp;
 import org.zj.mychat.common.user.domain.vo.resp.UserInfoResp;
+import org.zj.mychat.common.user.service.RoleService;
 import org.zj.mychat.common.user.service.UserService;
 
 import javax.validation.Valid;
@@ -31,6 +35,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RoleService roleService;
 
     @GetMapping("/userinfo")
     @ApiOperation("获取用户个人信息")
@@ -61,6 +68,16 @@ public class UserController {
     @ApiOperation("佩戴徽章")
     public ApiResult<Void> wearingBadges(@Valid @RequestBody WearingBagdeReq req) {
         userService.wearingBadges(RequestHolder.get().getUid(), req.getItemId());
+        return ApiResult.success();
+    }
+
+    @PutMapping("/black")
+    @ApiOperation("拉黑用户")
+    public ApiResult<Void> black(@Valid @RequestBody BlackReq req) {
+        Long uid = RequestHolder.get().getUid();
+        boolean hasPower = roleService.hasPower(uid, RoleEnum.ADMIN);
+        AssertUtil.isTrue(hasPower, "管理员无权限");
+        userService.black(req);
         return ApiResult.success();
     }
 }

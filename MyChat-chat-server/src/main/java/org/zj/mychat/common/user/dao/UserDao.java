@@ -1,5 +1,6 @@
 package org.zj.mychat.common.user.dao;
 
+import org.zj.mychat.common.common.domain.enums.YesOrNoEnum;
 import org.zj.mychat.common.user.domain.entity.User;
 import org.zj.mychat.common.user.mapper.UserMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -59,6 +60,17 @@ public class UserDao extends ServiceImpl<UserMapper, User> {
         lambdaUpdate()
                 .eq(User::getId, uid)
                 .set(User::getItemId, itemId)
+                .update();
+    }
+
+    /**
+     * 拉黑用户
+     * @param id 待拉黑的用户 id
+     */
+    public void invalidUid(Long id) {
+        lambdaUpdate()
+                .eq(User::getId, id)
+                .set(User::getStatus, YesOrNoEnum.YES.getStatus())
                 .update();
     }
 }

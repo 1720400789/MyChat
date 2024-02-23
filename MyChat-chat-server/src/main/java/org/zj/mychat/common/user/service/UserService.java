@@ -1,6 +1,7 @@
 package org.zj.mychat.common.user.service;
 
 import org.zj.mychat.common.user.domain.entity.User;
+import org.zj.mychat.common.user.domain.vo.req.BlackReq;
 import org.zj.mychat.common.user.domain.vo.req.ModifyNameReq;
 import org.zj.mychat.common.user.domain.vo.resp.BadgeResp;
 import org.zj.mychat.common.user.domain.vo.resp.UserInfoResp;
@@ -25,4 +26,6 @@ public interface UserService {
     List<BadgeResp> badges(Long uid);
 
     void wearingBadges(Long uid, Long itemId);
+
+    void black(BlackReq req);
 }

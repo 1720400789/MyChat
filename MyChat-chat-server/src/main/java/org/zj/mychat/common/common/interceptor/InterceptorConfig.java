@@ -17,12 +17,17 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Autowired
     private CollectorInterceptor collectorInterceptor;
 
+    @Autowired
+    private BlackInterceptor blackInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 注意这里配置的顺序就代表着过滤器责任链的顺序
         registry.addInterceptor(tokenInterceptor)
                 .addPathPatterns("/capi/**");
         registry.addInterceptor(collectorInterceptor)
+                .addPathPatterns("/capi/**");
+        registry.addInterceptor(blackInterceptor)
                 .addPathPatterns("/capi/**");
     }
 }

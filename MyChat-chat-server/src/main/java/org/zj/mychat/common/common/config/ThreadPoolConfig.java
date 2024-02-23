@@ -17,10 +17,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 @EnableAsync
 public class ThreadPoolConfig implements AsyncConfigurer {
+
     /**
      * 项目共用线程池
      */
     public static final String MYCHAT_EXECUTOR = "mychatExecutor";
+
     /**
      * websocket通信线程池
      */
@@ -31,6 +33,9 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         return mychatExecutor();
     }
 
+    /**
+     * 公共线程池
+     */
     @Bean(MYCHAT_EXECUTOR)
     @Primary
     public ThreadPoolTaskExecutor mychatExecutor() {
@@ -57,5 +62,26 @@ public class ThreadPoolConfig implements AsyncConfigurer {
 //    @Autowired
 //    @Qualifier(ThreadPoolConfig.MYCHAT_EXECUTOR)
 //    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+    @Bean(WS_EXECUTOR)
+    public ThreadPoolTaskExecutor websocketExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        // 开启线程池优雅停机，即停机前会阻止向线程池提交任务，并阻塞等待执行完线程池中的任务
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        // 核心线程数
+        executor.setCorePoolSize(16);
+        // 最大线程数
+        executor.setMaxPoolSize(16);
+        // 队列容量
+        executor.setQueueCapacity(1000);
+        // 线程池中线程名前缀
+        executor.setThreadNamePrefix("websocket-executor-");
+        // 配置线程池拒绝策略，满了就丢弃任务
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+        // 通过配置线程工厂来增强原生线程池，使其线程对象的异常能以日志的形式保存下来
+        executor.setThreadFactory(new MyThreadFactory(executor));
+        executor.initialize();
+        return executor;
+    }
 
 }
